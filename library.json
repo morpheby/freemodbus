@@ -10,6 +10,14 @@
   },
   "build": {
     "includeDir": "modbus/include",
+    "flags": [
+      "-Iport",
+      "-Imodbus/include",
+      "-Imodbus/ascii",
+      "-Imodbus/functions",
+      "-Imodbus/rtu",
+      "-Imodbus/tcp"
+    ],
     "srcDir": ".",
     "srcFilter": "+<modbus/**/*> +<port/**/*>"
   }
