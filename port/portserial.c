@@ -206,6 +206,9 @@ vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
                                       xUSARTHWMappings[ucUsedPort].USARTNotREPin->speed,
                                       xUSARTHWMappings[ucUsedPort].USARTNotREPin->mode };
             GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTNotREPin->gpio, &gpio);
+            xUSARTHWMappings[ucUsedPort].pUsart->CTLR3 |= USART_HardwareFlowControl_CTS;
+        } else {
+            xUSARTHWMappings[ucUsedPort].pUsart->CTLR3 &= ~USART_HardwareFlowControl_CTS;
         }
         if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
         {
@@ -213,6 +216,9 @@ vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
                                       xUSARTHWMappings[ucUsedPort].USARTDEPin->speed,
                                       xUSARTHWMappings[ucUsedPort].USARTDEPin->mode };
             GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin->gpio, &gpio);
+            xUSARTHWMappings[ucUsedPort].pUsart->CTLR3 |= USART_HardwareFlowControl_RTS;
+        } else {
+            xUSARTHWMappings[ucUsedPort].pUsart->CTLR3 &= ~USART_HardwareFlowControl_RTS;
         }
         xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 |= USART_Mode_Tx;
         USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TC, ENABLE);
@@ -237,6 +243,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
     
     usartInit.USART_Mode = 0;
     usartInit.USART_BaudRate = ulBaudRate;
+    usartInit.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     if( ( ucPORT <= USART_IDX_LAST ) )
     {
         bStatus = TRUE;
@@ -286,6 +293,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
                                           xUSARTHWMappings[ucUsedPort].USARTNotREPin->speed,
                                           xUSARTHWMappings[ucUsedPort].USARTNotREPin->mode };
                 GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTNotREPin->gpio, &gpio);
+                usartInit.USART_HardwareFlowControl |= USART_HardwareFlowControl_CTS;
             }
             if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
             {
@@ -293,6 +301,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
                                           xUSARTHWMappings[ucUsedPort].USARTDEPin->speed,
                                           xUSARTHWMappings[ucUsedPort].USARTDEPin->mode };
                 GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin->gpio, &gpio);
+                usartInit.USART_HardwareFlowControl |= USART_HardwareFlowControl_RTS;
             }
             
 #if USART1_REMAP == 1
