@@ -40,13 +40,21 @@
 #include "mbport.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define USART0_ENABLED          ( 1 )
-#define USART0_IDX              ( 0 )
+#define USART1_ENABLED          ( 0 )
+#define USART1_REMAP            ( 0 )
+#define USART1_IDX              ( 0 )
 
-#define USART1_ENABLED          ( 1 )
-#define USART1_IDX              ( USART0_IDX + USART0_ENABLED * 1 )
+#define USART2_ENABLED          ( 0 )
+#define USART2_IDX              ( USART1_IDX + USART1_ENABLED * 1 )
 
-#define USART_IDX_LAST          ( USART1_IDX )
+#define USART3_ENABLED          ( 0 )
+#define USART3_REMAP            ( 0 )
+#define USART3_IDX              ( USART1_IDX + USART1_ENABLED * 1 + USART2_ENABLED * 1 )
+
+#define USART4_ENABLED          ( 1 )
+#define USART4_IDX              ( USART1_IDX + USART1_ENABLED * 1 + USART2_ENABLED * 1 + USART3_ENABLED * 1  )
+
+#define USART_IDX_LAST          ( USART2_IDX )
 
 #define USART_INVALID_PORT      ( 0xFF )
 #define USART_NOT_RE_IDX        ( 3 )
@@ -54,27 +62,79 @@
 
 /* ----------------------- Static variables ---------------------------------*/
 
-#if USART1_ENABLED == 1
-const Pin       xUSART0Pins[] = {
-    PIN_USART0_TXD,
-    PIN_USART0_RXD
+typedef struct {
+    uint8_t pin;
+    GPIO_TypeDef *gpio;
+    GPIOSpeed_TypeDef speed;
+    GPIOMode_TypeDef mode;
+} Pin;
+
+#if USART1_ENABLED == 1 && USART1_REMAP == 0
+const Pin       xUSART1Pins[] = {
+    { GPIO_Pin_9, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_10, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
 };
+const Pin       xUSART1NotREPin = { GPIO_Pin_12, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART1DEPin = { GPIO_Pin_11, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
 #endif
 
-#if USART1_ENABLED == 1
-const Pin       xUSART1NotREPin = { 1 << 25, PIOA, ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT };
-const Pin       xUSART1DEPin = { 1 << 24, PIOA, ID_PIOA, PIO_OUTPUT_0, PIO_DEFAULT };
-
+#if USART1_ENABLED == 1 && USART1_REMAP == 1
 const Pin       xUSART1Pins[] = {
-    PIN_USART1_TXD,
-    PIN_USART1_RXD,
-    {1 << 23, PIOA, ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT}
+    { GPIO_Pin_6, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_7, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
 };
+const Pin       xUSART1NotREPin = { GPIO_Pin_12, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART1DEPin = { GPIO_Pin_11, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
+#endif
+
+#if USART2_ENABLED == 1
+const Pin       xUSART2Pins[] = {
+    { GPIO_Pin_2, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_3, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
+};
+const Pin       xUSART2NotREPin = { GPIO_Pin_1, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART2DEPin = { GPIO_Pin_0, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
+#endif
+
+#if USART3_ENABLED == 1 && USART3_REMAP == 0
+const Pin       xUSART3Pins[] = {
+    { GPIO_Pin_10, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_11, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING},
+};
+const Pin       xUSART3NotREPin = { GPIO_Pin_14, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART3DEPin = { GPIO_Pin_13, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
+#endif
+
+#if USART3_ENABLED == 1 && USART3_REMAP == 1
+const Pin       xUSART3Pins[] = {
+    { GPIO_Pin_10, GPIOC, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_11, GPIOC, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
+};
+const Pin       xUSART3NotREPin = { GPIO_Pin_14, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART3DEPin = { GPIO_Pin_13, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
+#endif
+
+#if USART4_ENABLED == 1 && USART4_REMAP == 0
+const Pin       xUSART4Pins[] = {
+    { GPIO_Pin_0, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_1, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
+};
+const Pin       xUSART4NotREPin = { GPIO_Pin_4, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART4DEPin = { GPIO_Pin_3, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
+#endif
+
+#if USART4_ENABLED == 1 && USART4_REMAP == 1
+const Pin       xUSART4Pins[] = {
+    { GPIO_Pin_5, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP },
+    { GPIO_Pin_5, GPIOB, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING },
+};
+const Pin       xUSART4NotREPin = { GPIO_Pin_15, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_AF_PP };
+const Pin       xUSART4DEPin = { GPIO_Pin_7, GPIOA, GPIO_Speed_50MHz, GPIO_Mode_IN_FLOATING };
 #endif
 
 const struct xUSARTHWMappings_t
 {
-    Usart          *pUsart;
+    USART_TypeDef  *pUsart;
     unsigned int    xUSARTID;
     IRQn_Type       xUSARTIrq;
     const Pin      *USARTNotREPin;
@@ -85,13 +145,21 @@ const struct xUSARTHWMappings_t
 
 } xUSARTHWMappings[] =
 {
-#if USART0_ENABLED == 1
-    {
-    USART0, ID_USART0, USART0_IRQn, NULL, NULL, &xUSART0Pins[0], PIO_LISTSIZE( xUSART0Pins )},
-#endif
 #if USART1_ENABLED == 1
     {
-    USART1, ID_USART1, USART1_IRQn, &xUSART1NotREPin, &xUSART1DEPin, &xUSART1Pins[0], PIO_LISTSIZE( xUSART1Pins )},
+    USART1, 0, USART1_IRQn, &xUSART1NotREPin, &xUSART1DEPin, &xUSART1Pins[0], 2},
+#endif
+#if USART2_ENABLED == 1
+    {
+    USART2, 1, USART2_IRQn, &xUSART2NotREPin, &xUSART2DEPin, &xUSART2Pins[0], 2},
+#endif
+#if USART3_ENABLED == 1
+    {
+    USART3, 2, USART3_IRQn, &xUSART3NotREPin, &xUSART3DEPin, &xUSART3Pins[0], 2},
+#endif
+#if USART4_ENABLED == 1
+    {
+    UART4, 3, UART4_IRQn, &xUSART4NotREPin, &xUSART4DEPin, &xUSART4Pins[0], 2},
 #endif
 };
 
@@ -100,36 +168,62 @@ static UCHAR    ucUsedPort = USART_INVALID_PORT;
 void
 vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
 {
-
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
     if( xRxEnable )
     {
-        USART_SetReceiverEnabled( xUSARTHWMappings[ucUsedPort].pUsart, 1 );
-        USART_EnableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IDR_RXRDY );
+        xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 |= USART_Mode_Rx;
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_RXNE, ENABLE);
     }
     else
     {
-        USART_DisableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IDR_RXRDY );
-        USART_SetReceiverEnabled( xUSARTHWMappings[ucUsedPort].pUsart, 0 );
+        xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 &= ~USART_Mode_Rx;
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_RXNE, DISABLE);
     }
+
+#if USART1_REMAP == 1
+    if (xUSARTHWMappings[ucUsedPort].pUsart == USART1) {
+        GPIO_PinRemapConfig(GPIO_Remap_USART1);
+    }
+#endif
+
+#if USART3_REMAP == 1
+    if (xUSARTHWMappings[ucUsedPort].pUsart == USART3) {
+        GPIO_PinRemapConfig(GPIO_PartialRemap_USART3);
+    }
+#endif
+
+#if USART4_REMAP == 1
+    if (xUSARTHWMappings[ucUsedPort].pUsart == USART4) {
+        GPIO_PinRemapConfig(GPIO_PartialRemap_USART4);
+    }
+#endif
 
     if( xTxEnable )
     {
         if( NULL != xUSARTHWMappings[ucUsedPort].USARTNotREPin )
         {
-            PIO_Set( xUSARTHWMappings[ucUsedPort].USARTNotREPin );
+            GPIO_InitTypeDef gpio = { xUSARTHWMappings[ucUsedPort].USARTNotREPin->pin,
+                                      xUSARTHWMappings[ucUsedPort].USARTNotREPin->speed,
+                                      xUSARTHWMappings[ucUsedPort].USARTNotREPin->mode };
+            GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTNotREPin->gpio, &gpio);
         }
         if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
         {
-            PIO_Set( xUSARTHWMappings[ucUsedPort].USARTDEPin );
+            GPIO_InitTypeDef gpio = { xUSARTHWMappings[ucUsedPort].USARTDEPin->pin,
+                                      xUSARTHWMappings[ucUsedPort].USARTDEPin->speed,
+                                      xUSARTHWMappings[ucUsedPort].USARTDEPin->mode };
+            GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin->gpio, &gpio);
+            pin_SetV32AFPin(xUSARTHWMappings[ucUsedPort].USARTDEPin->remap);
         }
-        USART_SetTransmitterEnabled( xUSARTHWMappings[ucUsedPort].pUsart, 1 );
-        USART_EnableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IER_TXRDY );
-        USART_DisableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IER_TXEMPTY );
+        xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 |= USART_Mode_Tx;
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TC, ENABLE);
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TXE, DISABLE);
     }
     else
     {
-        USART_DisableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IDR_TXRDY );
-        USART_EnableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IER_TXEMPTY );
+        xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 &= ~USART_Mode_Tx;
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TC, DISABLE);
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TXE, ENABLE);
     }
 }
 
@@ -137,20 +231,29 @@ BOOL
 xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity eParity )
 {
     BOOL            bStatus = FALSE;
-    uint32_t        uiMode = US_MR_USART_MODE_NORMAL;
+    
+    USART_InitTypeDef usartInit;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+    
+    usartInit.USART_Mode = 0;
+    usartInit.USART_BaudRate = ulBaudRate;
     if( ( ucPORT <= USART_IDX_LAST ) )
     {
         bStatus = TRUE;
         switch ( eParity )
         {
         case MB_PAR_NONE:
-            uiMode |= US_MR_PAR_NONE | US_MR_NBSTOP_2_BIT;
+            usartInit.USART_Parity = USART_Parity_No;
+            usartInit.USART_StopBits = USART_StopBits_2;
             break;
         case MB_PAR_ODD:
-            uiMode |= US_MR_PAR_ODD | US_MR_NBSTOP_1_BIT;
+            usartInit.USART_Parity = USART_Parity_Odd;
+            usartInit.USART_StopBits = USART_StopBits_1;
             break;
         case MB_PAR_EVEN:
-            uiMode |= US_MR_PAR_EVEN | US_MR_NBSTOP_1_BIT;
+            usartInit.USART_Parity = USART_Parity_Even;
+            usartInit.USART_StopBits = USART_StopBits_1;
             break;
         default:
             bStatus = FALSE;
@@ -160,10 +263,7 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
         switch ( ucDataBits )
         {
         case 8:
-            uiMode |= US_MR_CHRL_8_BITS;
-            break;
-        case 7:
-            uiMode |= US_MR_CHRL_7_BITS;
+            usartInit.USART_WordLength = USART_WordLength_8b;
             break;
         default:
             bStatus = FALSE;
@@ -175,21 +275,61 @@ xMBPortSerialInit( UCHAR ucPORT, ULONG ulBaudRate, UCHAR ucDataBits, eMBParity e
 
             NVIC_DisableIRQ( xUSARTHWMappings[ucUsedPort].xUSARTIrq );
 
-            PIO_Configure( xUSARTHWMappings[ucUsedPort].xUSARTPins, xUSARTHWMappings[ucUsedPort].xUSARTPinsCnt );
+            for (int i = 0; i < xUSARTHWMappings[ucUsedPort].xUSARTPinsCnt; ++i) {
+                GPIO_InitTypeDef gpio = { xUSARTHWMappings[ucUsedPort].xUSARTPins[i].pin,
+                                          xUSARTHWMappings[ucUsedPort].xUSARTPins[i].speed,
+                                          xUSARTHWMappings[ucUsedPort].xUSARTPins[i].mode };
+                GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin[i].gpio, &gpio);
+            }
             if( NULL != xUSARTHWMappings[ucUsedPort].USARTNotREPin )
             {
-                PIO_Configure( xUSARTHWMappings[ucUsedPort].USARTNotREPin, 1 );
+                GPIO_InitTypeDef gpio = { xUSARTHWMappings[ucUsedPort].USARTNotREPin->pin,
+                                          xUSARTHWMappings[ucUsedPort].USARTNotREPin->speed,
+                                          xUSARTHWMappings[ucUsedPort].USARTNotREPin->mode };
+                GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTNotREPin->gpio, &gpio);
             }
             if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
             {
-                PIO_Configure( xUSARTHWMappings[ucUsedPort].USARTDEPin, 1 );
+                GPIO_InitTypeDef gpio = { xUSARTHWMappings[ucUsedPort].USARTDEPin->pin,
+                                          xUSARTHWMappings[ucUsedPort].USARTDEPin->speed,
+                                          xUSARTHWMappings[ucUsedPort].USARTDEPin->mode };
+                GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin->gpio, &gpio);
             }
-            PMC_EnablePeripheral( xUSARTHWMappings[ucUsedPort].xUSARTID );
-            USART_Configure( xUSARTHWMappings[ucUsedPort].pUsart, uiMode, ulBaudRate, BOARD_MCK );
+            
+#if USART1_REMAP == 1
+            if (xUSARTHWMappings[ucUseducPORTPort].pUsart == USART1) {
+                GPIO_PinRemapConfig(GPIO_Remap_USART1);
+            }
+#endif
+
+#if USART3_REMAP == 1
+            if (xUSARTHWMappings[ucUsedPort].pUsart == USART3) {
+                GPIO_PinRemapConfig(GPIO_PartialRemap_USART3);
+            }
+#endif
+
+#if USART4_REMAP == 1
+            if (xUSARTHWMappings[ucUsedPort].pUsart == USART4) {
+                GPIO_PinRemapConfig(GPIO_PartialRemap_USART4);
+            }
+#endif
+
+            if (xUSARTHWMappings[ucUsedPort].pUsart == USART1) {
+                RCC_APB2PeriphResetCmd(RCC_APB2Periph_USART1, ENABLE);
+            } else if (xUSARTHWMappings[ucUsedPort].pUsart == USART2) {
+                RCC_APB1PeriphResetCmd(RCC_APB1Periph_USART2, ENABLE);
+            } else if (xUSARTHWMappings[ucUsedPort].pUsart == USART3) {
+                RCC_APB1PeriphResetCmd(RCC_APB1Periph_USART3, ENABLE);
+            } else if (xUSARTHWMappings[ucUsedPort].pUsart == UART4) {
+                RCC_APB1PeriphResetCmd(RCC_APB1Periph_UART4, ENABLE);
+            }
+            USART_Init(xUSARTHWMappings[ucUsedPort].pUsart, &usartInit);
 
             NVIC_ClearPendingIRQ( xUSARTHWMappings[ucUsedPort].xUSARTIrq );
             NVIC_SetPriority( xUSARTHWMappings[ucUsedPort].xUSARTIrq, 0xF << 4 );
             NVIC_EnableIRQ( xUSARTHWMappings[ucUsedPort].xUSARTIrq );
+
+            USART_Cmd(xUSARTHWMappings[ucUsedPort].pUsart, ENABLE);
         }
     }
 
@@ -202,15 +342,7 @@ vMBPortSerialClose( void )
     if( USART_INVALID_PORT != ucUsedPort )
     {
         NVIC_DisableIRQ( xUSARTHWMappings[ucUsedPort].xUSARTIrq );
-        PMC_DisablePeripheral( xUSARTHWMappings[ucUsedPort].xUSARTID );
-        if( NULL != xUSARTHWMappings[ucUsedPort].USARTNotREPin )
-        {
-            PIO_Clear( xUSARTHWMappings[ucUsedPort].USARTDEPin );
-        }
-        if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
-        {
-            PIO_Clear( xUSARTHWMappings[ucUsedPort].USARTNotREPin );
-        }
+        USART_Cmd(xUSARTHWMappings[ucUsedPort].pUsart, DISABLE);
         ucUsedPort = USART_INVALID_PORT;
     }
 }
@@ -218,49 +350,37 @@ vMBPortSerialClose( void )
 BOOL
 xMBPortSerialPutByte( CHAR ucByte )
 {
-    USART1->US_THR = ucByte;
+    USART_SendData(xUSARTHWMappings[ucUsedPort].pUsart, ucByte);
     return TRUE;
 }
 
 BOOL
 xMBPortSerialGetByte( CHAR * pucByte )
 {
-    *pucByte = USART1->US_RHR;
+    *pucByte = (CHAR) USART_ReceiveData(xUSARTHWMappings[ucUsedPort].pUsart);
     return TRUE;
 }
 
 void
 vUSARTHandler( void )
 {
-    uint32_t        uiCSR;
-    uint32_t        uiIMR;
     BOOL            bTaskWoken = FALSE;
 
     vMBPortSetWithinException( TRUE );
 
-    uiCSR = xUSARTHWMappings[ucUsedPort].pUsart->US_CSR;
-    uiIMR = xUSARTHWMappings[ucUsedPort].pUsart->US_IMR;
-    uint32_t        uiCSRMasked = uiCSR & uiIMR;
-
-    if( uiCSRMasked & US_CSR_RXRDY )
+    if( USART_GetFlagStatus(xUSARTHWMappings[ucUsedPort].pUsart, USART_FLAG_RXNE) == SET )
     {
         bTaskWoken = pxMBFrameCBByteReceived(  );
+        USART_ClearFlag(xUSARTHWMappings[ucUsedPort].pUsart, USART_FLAG_RXNE);
     }
-    if( uiCSRMasked & US_CSR_TXRDY )
+    if( USART_GetFlagStatus(xUSARTHWMappings[ucUsedPort].pUsart, USART_FLAG_TC) == SET )
     {
         bTaskWoken = pxMBFrameCBTransmitterEmpty(  );
+        USART_ClearFlag(xUSARTHWMappings[ucUsedPort].pUsart, USART_FLAG_TC);
     }
-    if( uiCSRMasked & US_CSR_TXEMPTY )
+    if( USART_GetFlagStatus(xUSARTHWMappings[ucUsedPort].pUsart, USART_FLAG_TXE) == SET )
     {
-        if( NULL != xUSARTHWMappings[ucUsedPort].USARTDEPin )
-        {
-            PIO_Clear( xUSARTHWMappings[ucUsedPort].USARTDEPin );
-        }
-        if( NULL != xUSARTHWMappings[ucUsedPort].USARTNotREPin )
-        {
-            PIO_Clear( xUSARTHWMappings[ucUsedPort].USARTNotREPin );
-        }
-        USART_DisableIt( xUSARTHWMappings[ucUsedPort].pUsart, US_IER_TXEMPTY );
+        USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TXE, DISABLE);
     }
     vMBPortSetWithinException( FALSE );
 
@@ -269,15 +389,31 @@ vUSARTHandler( void )
 
 #if USART1_ENABLED == 1
 void
-USART1_IrqHandler( void )
+USART1_IRQHandler( void )
 {
     vUSARTHandler(  );
 }
 #endif
 
-#if USART0_ENABLED == 1
+#if USART2_ENABLED == 1
 void
-USART0_IrqHandler( void )
+USART2_IRQHandler( void )
+{
+    vUSARTHandler(  );
+}
+#endif
+
+#if USART3_ENABLED == 1
+void
+USART3_IRQHandler( void )
+{
+    vUSARTHandler(  );
+}
+#endif
+
+#if USART4_ENABLED == 1
+void
+UART4_IRQHandler( void )
 {
     vUSARTHandler(  );
 }
