@@ -213,7 +213,6 @@ vMBPortSerialEnable( BOOL xRxEnable, BOOL xTxEnable )
                                       xUSARTHWMappings[ucUsedPort].USARTDEPin->speed,
                                       xUSARTHWMappings[ucUsedPort].USARTDEPin->mode };
             GPIO_Init(xUSARTHWMappings[ucUsedPort].USARTDEPin->gpio, &gpio);
-            pin_SetV32AFPin(xUSARTHWMappings[ucUsedPort].USARTDEPin->remap);
         }
         xUSARTHWMappings[ucUsedPort].pUsart->CTLR1 |= USART_Mode_Tx;
         USART_ITConfig(xUSARTHWMappings[ucUsedPort].pUsart, USART_IT_TC, ENABLE);
