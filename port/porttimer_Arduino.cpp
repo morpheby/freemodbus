@@ -62,35 +62,31 @@
 #define TIMER_PIN { 1 << 6, PIOA, ID_PIOA, PIO_OUTPUT_1, PIO_DEFAULT }
 #endif
 
-#if !__has_include("Arduino.h")
+#if __has_include("Arduino.h")
 
-#error "Implementation without Arduino is not done yet"
+#include "HardwareTimer.h"
 
 /* ----------------------- Static variables ---------------------------------*/
-#if MB_TIMER_DEBUG == 1
-const static Pin xTimerDebugPins[] = { TIMER_PIN };
-#endif
+
+static HardwareTimer hTimer(TIM4);
+
 
 /* ----------------------- Start implementation -----------------------------*/
+
+static
+void
+TimerPeriodHandler( void );
+
+extern "C"
 BOOL
 xMBPortTimersInit( USHORT usTim1Timerout50us )
 {
-#if MB_TIMER_DEBUG == 1
-    PIO_Configure( xTimerDebugPins, PIO_LISTSIZE( xTimerDebugPins ) );
-#endif
-    // NVIC_DisableIRQ( TCXIRQ );
-
-
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);   
-
-    PMC_EnablePeripheral( ID_TC0 );
-    TC_Configure( TCX, 0, TC_CMRX_WAVE | TC_CMRX_TCCLKS_TIMER_DIV4_CLOCK | TC_CMRX_WAVESEL_UP_RC | TC_CMRX_CPCSTOP );
-    TCX->TC_CHANNEL[TCCHANNEL].TC_RA = ( MB_TIMER_TICKS * usTim1Timerout50us ) / ( MB_50US_TICKS );
-    TCX->TC_CHANNEL[TCCHANNEL].TC_RC = ( MB_TIMER_TICKS * usTim1Timerout50us ) / ( MB_50US_TICKS );
-
-    NVIC_ClearPendingIRQ( TCXIRQ );
-    NVIC_SetPriority( TCXIRQ, 0xF << 4 );
-    NVIC_EnableIRQ( TCXIRQ );
+    hTimer.setMode(1, TIMER_DISABLED);
+    hTimer.pause();
+    uint32_t clkFreq = hTimer.getTimerClkFreq();
+    hTimer.setPrescaleFactor(clkFreq / 20000);
+    hTimer.setOverflow(usTim1Timerout50us, TICK_FORMAT);
+    hTimer.attachInterrupt(TimerPeriodHandler);
 
     return TRUE;
 }
@@ -98,27 +94,20 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
 void
 vMBPortTimerClose( void )
 {
-    NVIC_DisableIRQ( TCXIRQ );
-    PMC_DisablePeripheral( ID_TC0 );
+    hTimer.pause();
+    hTimer.detachInterrupt();
 }
 
 void
 vMBPortTimersEnable(  )
 {
-#if MB_TIMER_DEBUG == 1
-    PIO_Set( &xTimerDebugPins[0] );
-#endif
-    TCX->TC_CHANNEL[TCCHANNEL].TC_IER = TC_IERX_CPAS;
-    TC_Start( TCX, 0 );
+    hTimer.resume();
 }
 
 void
 vMBPortTimersDisable(  )
 {
-    TC_Stop( TCX, 0 );
-#if MB_TIMER_DEBUG == 1
-    PIO_Clear( &xTimerDebugPins[0] );
-#endif
+    hTimer.pause();
 }
 
 void
@@ -127,25 +116,19 @@ vMBPortTimersDelay( USHORT usTimeOutMS )
     vTaskDelay( usTimeOutMS / portTICK_RATE_MS );
 }
 
+static
 void
-TCX_IRQHANDLER( void )
+TimerPeriodHandler( void )
 {
-    uint32_t        xTCX_IMRX = TCX->TC_CHANNEL[TCCHANNEL].TC_IMR;
-    uint32_t        xTCX_SRX = TCX->TC_CHANNEL[TCCHANNEL].TC_SR;
-    uint32_t        uiSRMasked = xTCX_SRX & xTCX_IMRX;
     BOOL            bTaskWoken = FALSE;
 
     vMBPortSetWithinException( TRUE );
 
-    if( ( uiSRMasked & TC_SRX_CPAS ) > 0 )
-    {
-#if MB_TIMER_DEBUG == 1
-        PIO_Clear( &xTimerDebugPins[0] );
-#endif
-        ( void )pxMBPortCBTimerExpired(  );
-    }
+    ( void )pxMBPortCBTimerExpired(  );
+    
     vMBPortSetWithinException( FALSE );
 
     portEND_SWITCHING_ISR( bTaskWoken ? pdTRUE : pdFALSE );
 }
+
 #endif
