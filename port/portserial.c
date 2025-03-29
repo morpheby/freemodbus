@@ -40,14 +40,14 @@
 #include "mbport.h"
 
 /* ----------------------- Defines ------------------------------------------*/
-#define USART1_ENABLED          ( 0 )
+#define USART1_ENABLED          ( 1 )
 #define USART1_REMAP            ( 0 )
 #define USART1_IDX              ( 0 )
 
-#define USART2_ENABLED          ( 0 )
+#define USART2_ENABLED          ( 1 )
 #define USART2_IDX              ( USART1_IDX + USART1_ENABLED * 1 )
 
-#define USART3_ENABLED          ( 0 )
+#define USART3_ENABLED          ( 1 )
 #define USART3_REMAP            ( 0 )
 #define USART3_IDX              ( USART1_IDX + USART1_ENABLED * 1 + USART2_ENABLED * 1 )
 
@@ -57,8 +57,6 @@
 #define USART_IDX_LAST          ( USART2_IDX )
 
 #define USART_INVALID_PORT      ( 0xFF )
-#define USART_NOT_RE_IDX        ( 3 )
-#define USART_DE_IDX            ( 4 )
 
 /* ----------------------- Static variables ---------------------------------*/
 
