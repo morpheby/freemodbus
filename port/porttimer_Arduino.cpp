@@ -91,6 +91,7 @@ xMBPortTimersInit( USHORT usTim1Timerout50us )
     return TRUE;
 }
 
+extern "C"
 void
 vMBPortTimerClose( void )
 {
@@ -98,18 +99,21 @@ vMBPortTimerClose( void )
     hTimer.detachInterrupt();
 }
 
+extern "C"
 void
 vMBPortTimersEnable(  )
 {
     hTimer.resume();
 }
 
+extern "C"
 void
 vMBPortTimersDisable(  )
 {
     hTimer.pause();
 }
 
+extern "C"
 void
 vMBPortTimersDelay( USHORT usTimeOutMS )
 {

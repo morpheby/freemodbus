@@ -70,11 +70,19 @@ typedef long    LONG;
 #define MB_PORT_HAS_CLOSE	                    1
 #define MB_ASCII_TIMEOUT_WAIT_BEFORE_SEND_MS    2
 
+#ifdef __cplusplus
+PR_BEGIN_EXTERN_C
+#endif
+
 /* ----------------------- Prototypes ---------------------------------------*/
 void            vMBPortSetWithinException( BOOL bInException );
 BOOL            bMBPortIsWithinException( void );
 
 void            vMBPortEnterCritical( void );
 void            vMBPortExitCritical( void );
+
+#ifdef __cplusplus
+PR_END_EXTERN_C
+#endif
 
 #endif
