@@ -395,6 +395,7 @@ vUSARTHandler( void )
 
 #if USART1_ENABLED == 1
 void
+__attribute__((externally_visible, interrupt))
 USART1_IRQHandler( void )
 {
     vUSARTHandler(  );
@@ -403,6 +404,7 @@ USART1_IRQHandler( void )
 
 #if USART2_ENABLED == 1
 void
+__attribute__((externally_visible, interrupt))
 USART2_IRQHandler( void )
 {
     vUSARTHandler(  );
@@ -411,6 +413,7 @@ USART2_IRQHandler( void )
 
 #if USART3_ENABLED == 1
 void
+__attribute__((externally_visible, interrupt))
 USART3_IRQHandler( void )
 {
     vUSARTHandler(  );
@@ -419,6 +422,7 @@ USART3_IRQHandler( void )
 
 #if USART4_ENABLED == 1
 void
+__attribute__((externally_visible, interrupt))
 UART4_IRQHandler( void )
 {
     vUSARTHandler(  );
