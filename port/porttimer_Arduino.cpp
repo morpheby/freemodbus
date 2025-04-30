@@ -103,6 +103,7 @@ extern "C"
 void
 vMBPortTimersEnable(  )
 {
+    hTimer.setCount(0);
     hTimer.resume();
 }
 

@@ -267,7 +267,6 @@ eMBRegisterCB( UCHAR ucFunctionCode, pxMBFunctionHandler pxHandler )
     return eStatus;
 }
 
-
 eMBErrorCode
 eMBClose( void )
 {

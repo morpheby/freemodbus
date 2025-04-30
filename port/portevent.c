@@ -84,7 +84,7 @@ xMBPortEventGet( eMBEventType * peEvent )
 {
     BOOL            xEventHappened = FALSE;
 
-    if( pdTRUE == xQueueReceive( xQueueHdl, peEvent, portTICK_RATE_MS * 50 ) )
+    if( pdTRUE == xQueueReceive( xQueueHdl, peEvent, pdMS_TO_TICKS(50) ) )
     {
         xEventHappened = TRUE;
     }
